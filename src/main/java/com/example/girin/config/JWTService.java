@@ -3,14 +3,12 @@ package com.example.girin.config;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.io.Decoder;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.security.Key;
-import java.util.Base64;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -18,6 +16,8 @@ import java.util.function.Function;
 
 @Service
 public class JWTService {
+
+    private static final int TOKEN_DURATION_MS = 8 * 60 * 60 * 1000;
     private static final String SECRET_KEY = "78214125442A472D4A614E645267556B58703273357638792F423F4528482B4D";
     public String extractUsername(String jwt){
         return extractClaim(jwt, Claims::getSubject);
@@ -51,7 +51,7 @@ public class JWTService {
                 .setClaims(extraClaims)
                 .setSubject(userDetails.getUsername())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + 1 * 60 * 1000))
+                .setExpiration(new Date(System.currentTimeMillis() + TOKEN_DURATION_MS))
                 .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                 .compact();
     }

@@ -18,7 +18,7 @@ import java.io.IOException;
 @Component
 @RequiredArgsConstructor
 public class JwtAuthenticationFilter extends OncePerRequestFilter {
-
+    private final int START_OF_JWT_SUBSTR = 7;
     private final JWTService jwtService;
     private final UserDetailsService userDetailsService;
     @Override
@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return ;
         }
-        jwt = authHeader.substring(7);
+        jwt = authHeader.substring(START_OF_JWT_SUBSTR);
         userEmail = jwtService.extractUsername(jwt);
         if( userEmail != null && SecurityContextHolder.getContext().getAuthentication() == null){
             UserDetails user = this.userDetailsService.loadUserByUsername(userEmail);
