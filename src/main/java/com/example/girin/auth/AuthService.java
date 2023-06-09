@@ -1,6 +1,7 @@
 package com.example.girin.auth;
 
 import com.example.girin.config.JWTService;
+import com.example.girin.exceptions.auth.UserAlreadyExistsException;
 import com.example.girin.user.Role;
 import com.example.girin.user.User;
 import com.example.girin.user.UserRepository;
@@ -22,6 +23,10 @@ public class AuthService {
     public AuthenticationResponse register(RegisterRequest req){
         //final Optional<User> user = userRepo.findByEmail(req.getEmail());
 
+        if(userRepo.findByEmail(req.getEmail()).isPresent()){
+            throw new UserAlreadyExistsException("User already exists");
+        }
+
         User newUser = new User();
         newUser.setEmail(req.getEmail());
         newUser.setFirstname(req.getFirstname());
@@ -30,6 +35,7 @@ public class AuthService {
         newUser.setRole(Role.USER);
 
         userRepo.save(newUser);
+
         String token = jwtService.generateToken(newUser);
 
         return AuthenticationResponse.builder().token(token).build();
